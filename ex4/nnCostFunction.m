@@ -62,6 +62,57 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+%%%%%%%%%%%%%%%%
+% part 1
+
+% a1/X is "m x input_layer_size"
+a1 = X;
+
+% Theta1 is "hiden_lay_size x (input_layer_size + 1)"
+% z2/a2 is "m x hidden_layer_size"
+z2 = [ones(size(a1, 1), 1) a1] * Theta1';
+a2 = sigmoid(z2);
+
+% Theta2 is "num_labels x (hiden_layer_size + 1)"
+% z3/a3 is "m x num_labels"
+z3 = [ones(size(a2, 1), 1) a2] * Theta2';
+a3 = sigmoid(z3);
+
+% calculate cost J
+
+% input y is "m x 1" which need to be converted to Y
+% as "m x num_labels" matrix
+method = 2;
+fprintf('Use cost method %d', method);
+
+if method == 2
+    Y = zeros(m, num_labels);
+end
+J = 0;
+for i=1:num_labels
+    yi = (y == i);  % m x 1
+
+    if method == 1
+        ai = a3(:,i);   % m x 1
+        J = J - sum(yi .* log(ai) + (1 - yi) .* log(1 - ai));
+
+    else if method == 2
+        Y(:, i) = yi;
+    end
+end
+if method == 2
+    J = -sum(sum(Y .* log(a3) + (1 - Y) .* log(1 - a3)));
+end
+J = J / m;
+
+
+
+%%%%%%%%%%%%%%%%
+% part 2
+
+
+%%%%%%%%%%%%%%%%
+% part 3
 
 
 
