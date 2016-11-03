@@ -56,7 +56,7 @@ error_val   = zeros(m, 1);
 lambda = 0;
 for i = 1:m
     XiTrain = X(1:i, :);
-    yiTrain = y(1:i, :);
+    yiTrain = y(1:i);
 
     theta = trainLinearReg(XiTrain, yiTrain, lambda);
 
