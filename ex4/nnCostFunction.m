@@ -65,7 +65,7 @@ a3 = sigmoid(z3);
 %   which needs a "for" loop for the calculation.
 % - method 2 is the more complete vectorization implementation.
 method = 2;
-fprintf('Use cost method %d\n', method);
+%fprintf('Use cost method %d\n', method);
 
 if method == 2
     y2 = zeros(m, num_labels);
@@ -106,8 +106,8 @@ J = J / m;
 %               first time.
 %
 
-Delta_3 = zeros(m, num_labels);
-Delta_2 = zeros(m, hidden_layer_size);
+delta_1 = zeros(size(Theta1));  % hidden_layer_size x (input_layer_size + 1)
+delta_2 = zeros(size(Theta2));  % num_labels x (hidden_layer_size + 1)
 for t=1:m
     xt = X(t,:)';                % input_layer_size x 1
     yt = y2(t,:)';               % num_labels x 1
@@ -120,16 +120,18 @@ for t=1:m
     zt3 = Theta2 * [1; at2];     % num_labels x (hidden_layer_size + 1) x 1
     at3 = sigmoid(zt3);
 
-    delta_3t = at3 - yt;         % num_labels x 1
-    delta_2t = Theta2(:,2:end)' * delta_3t .* sigmoidGradient(zt2); % hidden_layer_size x (num_labels) x 1
+    dt3 = at3 - yt;              % num_labels x 1
+    dt2 = Theta2(:,2:end)' * dt3 .* sigmoidGradient(zt2); % hidden_layer_size x (num_labels) x 1
 
-    Delta_3(t,:) = delta_3t';
-    Delta_2(t,:) = delta_2t';
+    delta_1 = delta_1 + dt2 * [1; at1]';  % hidden_layer_size x (1) x (input_layer_size + 1) = size(Theta1)
+    delta_2 = delta_2 + dt3 * [1; at2]';  % num_labels x (1) x (hidden_layer_size + 1) = size(Theta2)
 end
-%Delta_3 = a3 - y2;
 
+Theta1woBias = Theta1(:,2:end);
+Theta2woBias = Theta2(:,2:end);
+Theta1_grad = delta_1 / m + lambda / m * [zeros(size(Theta1, 1), 1), Theta1woBias];
+Theta2_grad = delta_2 / m + lambda / m * [zeros(size(Theta2, 1), 1), Theta2woBias];
 
-%Delta_2 = Theta2' * Delta_3 .* sigmoidGradient(z2);
 
 
 %%%%%%%%%%%%%%%%
@@ -139,8 +141,8 @@ end
 %               backpropagation. That is, you can compute the gradients for
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
-J = J + (sum([Theta1(:,2:end)(:); ...
-              Theta2(:,2:end)(:)].^2)) * lambda / (2 * m);
+J = J + (sum(sum(Theta1woBias.^2)) ...
+       + sum(sum(Theta2woBias.^2))) * lambda / (2 * m);
 
 
 
