@@ -21,7 +21,11 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
-
+for i = 1:size(X, 1)
+    Xi = ones(K, 1) * X(i, :);
+    [val, idx(i)] = min(sum((Xi - centroids) .^ 2, 2));
+    %fprintf('Closest of X(%d) is %d with value %d\n', i, idx(i), val);
+end
 
 
 

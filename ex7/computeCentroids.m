@@ -27,7 +27,12 @@ centroids = zeros(K, n);
 %
 
 
-
+for k = 1:K
+    idxBinK = idx == k;
+    Ck = sum(idxBinK);
+    Xk = X .* idxBinK;
+    centroids(k, :) = sum(Xk, 1) ./ Ck;
+end
 
 
 
