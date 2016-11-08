@@ -10,8 +10,12 @@ bestEpsilon = 0;
 bestF1 = 0;
 F1 = 0;
 
+m = length(yval);
+
 stepsize = (max(pval) - min(pval)) / 1000;
+fprintf('min(pval) = %f, max(pval) = %f\n', min(pval), max(pval));
 for epsilon = min(pval):stepsize:max(pval)
+%for epsilon = 8.99e-05
     
     % ====================== YOUR CODE HERE ======================
     % Instructions: Compute the F1 score of choosing epsilon as the
@@ -23,10 +27,30 @@ for epsilon = min(pval):stepsize:max(pval)
     % Note: You can use predictions = (pval < epsilon) to get a binary vector
     %       of 0's and 1's of the outlier predictions
 
+    predict = pval < epsilon;
+    real = yval == 1;  % normalize to {0, 1}
 
+    allPredictPositive = sum(predict); % = tp + fp
+    allRealTrue = sum(real); % = tp + tn;
 
+    tp = sum(predict & real);
+    %fp = sum(predict & ~real);
+    %tn = sum(~predict & real);
+    %fn = sum(~predict & ~real);
+    
 
+    if allPredictPositive == 0
+        fprintf('tp + fp == 0 causes precision divided by zero error, while epsilon equals to %f\n', epsilon);
+        continue;
+    elseif allRealTrue == 0
+        fprintf('tp + tn == 0 causes recall divided by zero error, while epsilon equals to %f\n', epsilon);
+        continue;
+    end
 
+    prec = tp / allPredictPositive;
+    rec  = tp / allRealTrue;
+
+    F1 = 2 * prec * rec / (prec + rec);
 
 
 
