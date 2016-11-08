@@ -55,27 +55,35 @@ if method == 1
 
 
 % ============ method 2 with for-loop ======================
+% NOTE: method 2 will be very slow in subsequent test!!!!! be patient...
 elseif method == 2
     J = 0;
     for i = 1:num_movies
         x_i = X(i, :)';
-        for j = 1:num_users
-            if (R(i, j) == 1)
-                theta_j = Theta(j, :)';
 
+        for j = 1:num_users
+            theta_j = Theta(j, :)';
+
+            if (R(i, j) == 1)
                 delta_i_j = theta_j' * x_i - Y(i, j);
                 J = J + delta_i_j^2;
 
                 X_grad(i, :) = X_grad(i, :) ...
-                    + delta_i_j * theta_j' ...
-                    + lambda * x_i';
+                    + delta_i_j * theta_j';
+
                 Theta_grad(j, :) = Theta_grad(j, :) ...
-                    + delta_i_j * x_i' ...
-                    + lambda * theta_j';
+                    + delta_i_j * x_i';
+            end
+
+            % only add once
+            if i == 1
+                Theta_grad(j, :) = Theta_grad(j, :) + lambda * theta_j';
             end
         end
+
+        X_grad(i, :) = X_grad(i, :) + lambda * x_i';
     end
-    J = J / 2;
+    J = (J + (sum(sum(X.^2)) + sum(sum(Theta.^2))) * lambda) / 2;
 end
 
 
