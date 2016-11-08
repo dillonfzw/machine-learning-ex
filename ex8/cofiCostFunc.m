@@ -41,11 +41,42 @@ Theta_grad = zeros(size(Theta));
 %
 
 
+method = 1;
 
-J = sum(sum(X * Theta' .* R) .^2) / 2;
+% ============ method 1 with vectorized operations ======================
+if method == 1
+    Delta = (X * Theta' - Y) .* R;
+
+    J = sum(sum(Delta .^2)) / 2 ...
+      + (sum(sum(Theta.^2)) + sum(sum(X.^2))) * lambda / 2;
+
+    X_grad = Delta * Theta + lambda * X;
+    Theta_grad = Delta' * X + lambda * Theta;
 
 
+% ============ method 2 with for-loop ======================
+elseif method == 2
+    J = 0;
+    for i = 1:num_movies
+        x_i = X(i, :)';
+        for j = 1:num_users
+            if (R(i, j) == 1)
+                theta_j = Theta(j, :)';
 
+                delta_i_j = theta_j' * x_i - Y(i, j);
+                J = J + delta_i_j^2;
+
+                X_grad(i, :) = X_grad(i, :) ...
+                    + delta_i_j * theta_j' ...
+                    + lambda * x_i';
+                Theta_grad(j, :) = Theta_grad(j, :) ...
+                    + delta_i_j * x_i' ...
+                    + lambda * theta_j';
+            end
+        end
+    end
+    J = J / 2;
+end
 
 
 
