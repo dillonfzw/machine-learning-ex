@@ -23,8 +23,11 @@ sigma2 = zeros(n, 1);
 
 
 
-mu = sum(X, 1)' / m;
-sigma2 = sum((X - mu') .^ 2, 1) / m;
+%mu = sum(X, 1)' / m;
+%sigma2 = sum((X - mu') .^ 2, 1)' / m;
+
+mu = mean(X, 1)';
+sigma2 = var(X, 1, 1)';
 
 
 
